@@ -13,7 +13,7 @@ def parse_args():
     parser = argparse.ArgumentParser(description='Train a heart detector')
     parser.add_argument('--source', type=str, default='voch1', help='source domain for training')
     parser.add_argument('--target', type=str, default='voch2', help='target domain for testing')
-    parser.add_argument('--device', type=str, default='cuda:1', help='device to use')
+    parser.add_argument('--device', type=str, default='cuda:0', help='device to use')
     parser.add_argument('--suffix', type=str, default='', help='suffix to add to the experiment name')
     args = parser.parse_args()
     return args
@@ -107,6 +107,20 @@ def main():
     cfg.optim_wrapper.optimizer.lr = 0.02 / 16
     cfg.train_cfg.max_epochs = 36
     cfg.train_cfg.val_interval = 1
+    
+    # 修改学习率调度策略
+    cfg.param_scheduler = [
+        dict(
+            type='LinearLR', start_factor=0.001, by_epoch=False, begin=0, end=500),
+        dict(
+            type='MultiStepLR',
+            begin=0,
+            end=36,  # 总epoch数
+            by_epoch=True,
+            milestones=[24, 32],  # 在第24和32个epoch时降低学习率
+            gamma=0.1
+        )
+    ]
     
     # 修改默认钩子配置
     cfg.default_hooks = dict(

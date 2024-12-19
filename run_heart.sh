@@ -4,7 +4,7 @@
 DOMAINS=("voch1" "voch2" "voch3")
 GPU_IDS=(1 2 3)  # 使用三张GPU卡
 TRAIN_SCRIPT="train_heart.py"
-LOG_SUFFIX="_r101"
+SUFFIX="baseline"
 
 # 创建logs目录（如果不存在）
 mkdir -p logs
@@ -22,7 +22,7 @@ for SOURCE in "${DOMAINS[@]}"; do
             GPU_INDEX=$((counter % ${#GPU_IDS[@]}))
             GPU_ID=${GPU_IDS[$GPU_INDEX]}
             
-            LOG_FILE="logs/${SOURCE}To${TARGET}${LOG_SUFFIX}.log"
+            LOG_FILE="logs/${SOURCE}To${TARGET}_${SUFFIX}.log"
             
             echo "Starting experiment: ${SOURCE} to ${TARGET} on GPU ${GPU_ID}"
             echo "Log file: ${LOG_FILE}"
@@ -31,6 +31,7 @@ for SOURCE in "${DOMAINS[@]}"; do
             nohup env CUDA_VISIBLE_DEVICES=${GPU_ID} python ${TRAIN_SCRIPT} \
                 --source ${SOURCE} \
                 --target ${TARGET} \
+                --suffix ${SUFFIX} \
                 --device cuda:0 > "${LOG_FILE}" 2>&1 &
             
             # 更新计数器
@@ -47,7 +48,7 @@ echo "To monitor the experiments, use one of:"
 for SOURCE in "${DOMAINS[@]}"; do
     for TARGET in "${DOMAINS[@]}"; do
         if [ "$SOURCE" != "$TARGET" ]; then
-            echo "  tail -f logs/${SOURCE}To${TARGET}${LOG_SUFFIX}.log"
+            echo "  tail -f logs/${SOURCE}To${TARGET}_${SUFFIX}.log"
         fi
     done
 done

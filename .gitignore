@@ -110,6 +110,8 @@ data
 .DS_Store
 wandb/
 logs/
+outputs/
+vis_data/
 
 # custom
 *.pkl
