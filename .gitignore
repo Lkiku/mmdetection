@@ -108,6 +108,8 @@ data
 .vscode
 .idea
 .DS_Store
+wandb/
+logs/
 
 # custom
 *.pkl
